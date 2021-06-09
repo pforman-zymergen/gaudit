@@ -13,24 +13,30 @@ type Audit struct {
 }
 
 type Repo struct {
-	ID            int64
-	FullName      string
-	Owner         string
-	Name          string
-	Description   string
-	Language      string
-	Topics        []string
-	DefaultBranch string
-	Private       bool
-	Archived      bool
-	Disabled      bool
-	License       string
-	Stargazers    int
-	Forks         int
-	Watchers      int
-	Size          int
-	Updated       time.Time
-	Teams         []Team
+	ID                   int64
+	FullName             string
+	Owner                string
+	Name                 string
+	Description          string
+	Language             string
+	Topics               []string
+	DefaultBranch        string
+	Private              bool
+	Archived             bool
+	Disabled             bool
+	License              string
+	Stargazers           int
+	Forks                int
+	Watchers             int
+	Size                 int
+	Updated              time.Time
+	Teams                []Team
+	Visibility           string
+	OutsideCollaborators []OutsideCollaborator
+}
+
+type OutsideCollaborator struct {
+	Name string
 }
 
 type Team struct {

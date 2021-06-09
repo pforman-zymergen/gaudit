@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/google/go-github/v25/github"
+	"github.com/google/go-github/v35/github"
 	"github.com/hashicorp/gaudit/config"
 	"golang.org/x/oauth2"
 )
@@ -63,15 +63,23 @@ func Refresh(options config.Options) (audit Audit, err error) {
 			}
 
 			// get collaborators
-			/*
-				users, _, err := client.Repositories.ListCollaborators(ctx, options.Organization, *r.Name, nil)
-				if err != nil {
-					return audit, err
-				}
-				if options.Debug {
-					log.Printf("USERS: %+v", users)
-				}
-			*/
+			coll_options := github.ListCollaboratorsOptions{
+				Affiliation: "outside",
+			}
+			collaborators, _, err := client.Repositories.ListCollaborators(ctx, options.Organization, *r.Name, &coll_options)
+			if err != nil {
+				//return audit, err
+				log.Print("ERROR: " + err.Error())
+			}
+			if options.Debug {
+				log.Printf("OUTSIDE_COLLABS: %+v", collaborators)
+			}
+			var ocList []OutsideCollaborator
+			for _, oc := range collaborators {
+				ocList = append(ocList, OutsideCollaborator{
+					Name: *oc.Login,
+				})
+			}
 
 			// get teams
 			teams, _, err := client.Repositories.ListTeams(ctx, options.Organization, *r.Name, nil)
@@ -91,24 +99,26 @@ func Refresh(options config.Options) (audit Audit, err error) {
 
 			// save record
 			audit.Repos[*r.FullName] = Repo{
-				ID:            *r.ID,
-				FullName:      *r.FullName,
-				Owner:         *r.Owner.Login,
-				Name:          *r.Name,
-				Description:   description,
-				Language:      language,
-				Topics:        r.Topics,
-				DefaultBranch: *r.DefaultBranch,
-				Private:       *r.Private,
-				Archived:      *r.Archived,
-				Disabled:      *r.Disabled,
-				License:       license,
-				Stargazers:    *r.StargazersCount,
-				Forks:         *r.ForksCount,
-				Watchers:      *r.WatchersCount,
-				Size:          *r.Size,
-				Updated:       r.UpdatedAt.Time,
-				Teams:         teamList,
+				ID:                   *r.ID,
+				FullName:             *r.FullName,
+				Owner:                *r.Owner.Login,
+				Name:                 *r.Name,
+				Description:          description,
+				Language:             language,
+				Topics:               r.Topics,
+				DefaultBranch:        *r.DefaultBranch,
+				Private:              *r.Private,
+				Archived:             *r.Archived,
+				Disabled:             *r.Disabled,
+				License:              license,
+				Stargazers:           *r.StargazersCount,
+				Forks:                *r.ForksCount,
+				Watchers:             *r.WatchersCount,
+				Size:                 *r.Size,
+				Updated:              r.UpdatedAt.Time,
+				Teams:                teamList,
+				Visibility:           *r.Visibility,
+				OutsideCollaborators: ocList,
 			}
 
 		}
@@ -129,7 +139,7 @@ func Refresh(options config.Options) (audit Audit, err error) {
 	}
 
 	// sort list
-	for k, _ := range audit.Repos {
+	for k := range audit.Repos {
 		audit.Index = append(audit.Index, k)
 	}
 	sort.Strings(audit.Index)

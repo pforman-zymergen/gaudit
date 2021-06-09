@@ -54,6 +54,7 @@ func Details(options config.Options) {
 			fmt.Println("  language:    " + repo.Language)
 			fmt.Println("  topics:      " + strings.Join(repo.Topics, ","))
 			fmt.Println("  private:     " + strconv.FormatBool(repo.Private))
+			fmt.Println("  visibility:  " + repo.Visibility)
 			fmt.Println("  archived:    " + strconv.FormatBool(repo.Archived))
 			fmt.Println("  disabled:    " + strconv.FormatBool(repo.Disabled))
 			fmt.Println("  license:     " + repo.License)
@@ -66,6 +67,11 @@ func Details(options config.Options) {
 			fmt.Print("  teams:       ")
 			for _, t := range repo.Teams {
 				fmt.Print(t.Name + " (" + t.Permission + ")  ")
+			}
+			fmt.Println()
+			fmt.Print("  outside collaborators:       ")
+			for _, oc := range repo.OutsideCollaborators {
+				fmt.Print(oc.Name + "  ")
 			}
 			fmt.Println("")
 			for _, rule := range audit.Results[k].Rules {

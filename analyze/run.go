@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/go-github/v25/github"
+	"github.com/google/go-github/v35/github"
 	"github.com/hashicorp/gaudit/config"
 	"github.com/hashicorp/gaudit/state"
 	"golang.org/x/oauth2"
